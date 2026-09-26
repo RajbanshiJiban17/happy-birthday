@@ -155,6 +155,7 @@
       <a href="#hero" class="hover:text-rose-400 transition-colors">Home</a>
       <a href="#special-spotlight" class="hover:text-rose-400 transition-colors">Highlights</a>
       <a href="#cube-3d" class="hover:text-rose-400 transition-colors">3D Cube</a>
+      <a href="#calendar" class="hover:text-rose-400 transition-colors">Calendar</a>
       <a href="#shayari" class="hover:text-rose-400 transition-colors">Ghazal & Shayari</a>
       <a href="#gallery" class="hover:text-rose-400 transition-colors">Gallery (34)</a>
       <a href="#letter" class="hover:text-rose-400 transition-colors">Love Letter</a>
@@ -283,6 +284,19 @@
     </div>
   </section>
 
+    <!-- Birthday Calendar Section -->
+  <section id="calendar" class="py-20 px-4 max-w-6xl mx-auto text-center">
+    <div class="mb-12">
+      <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase">Our Special Date</span>
+      <h2 class="text-4xl sm:text-6xl font-romantic text-rose-300 mt-2">पूर्ण वर्ष क्यालेन्डर २०८३</h2>
+      <p class="text-slate-400 text-sm sm:text-base mt-2 font-nepali">असोज महिनाको गुलाबी मिति नै तिम्रो जन्मदिन हो — थिचेर हेर्नुहोस् 🎂</p>
+    </div>
+
+    <div id="year-calendar-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+      <!-- Populated dynamically via JS -->
+    </div>
+  </section>
+
   <!-- Nepali Romantic Shayari & Ghazal Section -->
   <section id="shayari" class="py-20 px-4 max-w-6xl mx-auto">
     <div class="text-center mb-16">
@@ -407,9 +421,95 @@
       <p id="lightbox-counter" class="text-xs text-slate-400 mt-1"></p>
     </div>
   </div>
+    <!-- Birthday Special Popup Modal (Calendar) -->
+  <div id="bday-popup" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-card-pink p-8 sm:p-12 rounded-3xl max-w-md text-center border border-rose-400/40 shadow-2xl relative">
+      <button onclick="closeBdayPopup()" class="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-6 text-rose-400 animate-bounce">
+        <i data-lucide="cake" class="w-10 h-10"></i>
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-romantic text-rose-200 mb-2">२९ असोज, २०८३ ❤️</h2>
+      <p class="text-slate-200 font-nepali text-base sm:text-lg mb-6 leading-relaxed">
+        यही त हो त्यो सुनौलो दिन जब मेरो मुटु यस संसारमा आयो। जन्मदिनको लाखौं शुभकामना मेरो प्यारी श्रीमती!
+      </p>
+      <button onclick="launchCelebration()" class="w-full py-4 bg-gradient-to-r from-rose-500 via-pink-600 to-red-500 text-white font-semibold rounded-full shadow-lg shadow-rose-600/40 hover:scale-105 transition-all flex items-center justify-center gap-2 text-base">
+        <i data-lucide="party-popper" class="w-5 h-5"></i>
+        Celebrate ✨
+      </button>
+    </div>
+  </div>
 
   <script>
     lucide.createIcons();
+
+        // ===== Nepali Full Year Calendar (2083) =====
+    const BIRTHDAY_MONTH_INDEX = 5; // 0-based, असोज is 6th month
+    const BIRTHDAY_DAY = 29; // असोज २९, २०८३
+
+    const nepaliMonths = [
+      { np: 'बैशाख',  en: 'Baisakh', days: 31 },
+      { np: 'जेठ',    en: 'Jestha',  days: 31 },
+      { np: 'असार',   en: 'Ashadh',  days: 32 },
+      { np: 'साउन',   en: 'Shrawan', days: 31 },
+      { np: 'भदौ',    en: 'Bhadra',  days: 31 },
+      { np: 'असोज',   en: 'Ashoj',   days: 30 },
+      { np: 'कात्तिक', en: 'Kartik',  days: 30 },
+      { np: 'मंसिर',  en: 'Mangsir', days: 30 },
+      { np: 'पुष',    en: 'Poush',   days: 29 },
+      { np: 'माघ',    en: 'Magh',    days: 29 },
+      { np: 'फागुन',  en: 'Falgun',  days: 30 },
+      { np: 'चैत',    en: 'Chaitra', days: 31 }
+    ];
+
+    function renderYearCalendar() {
+      const wrap = document.getElementById('year-calendar-grid');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+
+      nepaliMonths.forEach((month, mIdx) => {
+        const isBdayMonth = mIdx === BIRTHDAY_MONTH_INDEX;
+
+        const card = document.createElement('div');
+        card.className = isBdayMonth
+          ? 'glass-card-pink rounded-3xl p-5 border-2 border-rose-400/70 shadow-xl shadow-rose-900/40 tilt-card relative overflow-hidden'
+          : 'glass-card rounded-3xl p-5 border border-white/10 tilt-card relative overflow-hidden';
+
+        let daysHtml = '';
+        for (let day = 1; day <= month.days; day++) {
+          const isBday = isBdayMonth && day === BIRTHDAY_DAY;
+          if (isBday) {
+            daysHtml += `<div onclick="openBdayPopup()" title="तिम्रो जन्मदिन! थिच्नुहोस् 🎂" class="aspect-square flex items-center justify-center rounded-lg cursor-pointer bg-gradient-to-br from-rose-400 via-pink-500 to-rose-600 text-white font-extrabold text-[11px] sm:text-xs shadow-md shadow-rose-600/60 ring-2 ring-rose-200/80 animate-pulse hover:scale-125 transition-transform">${day}</div>`;
+          } else {
+            daysHtml += `<div class="aspect-square flex items-center justify-center rounded-lg text-slate-300/80 text-[10px] sm:text-xs bg-white/[0.04]">${day}</div>`;
+          }
+        }
+
+        card.innerHTML = `
+          ${isBdayMonth ? '<span class="absolute top-3 right-3 text-[10px] px-2 py-1 bg-rose-500/90 rounded-full font-nepali font-semibold shadow-md">जन्मदिन महिना 🎂</span>' : ''}
+          <h3 class="font-romantic text-2xl sm:text-3xl ${isBdayMonth ? 'text-rose-200' : 'text-rose-300/90'} mb-0.5">${month.np}</h3>
+          <p class="text-[10px] sm:text-xs text-slate-400 tracking-widest uppercase mb-4">${month.en} 2083</p>
+          <div class="grid grid-cols-7 gap-1 sm:gap-1.5">${daysHtml}</div>
+        `;
+
+        wrap.appendChild(card);
+      });
+    }
+    renderYearCalendar();
+
+    function openBdayPopup() {
+      const popup = document.getElementById('bday-popup');
+      popup.classList.remove('hidden');
+      popup.classList.add('flex');
+      launchCelebration();
+    }
+
+    function closeBdayPopup() {
+      const popup = document.getElementById('bday-popup');
+      popup.classList.add('hidden');
+      popup.classList.remove('flex');
+    }
 
     // All 34 Exact Uploaded Photos Array
     const allPhotos = [
